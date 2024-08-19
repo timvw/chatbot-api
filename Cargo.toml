@@ -2,5 +2,9 @@
 name = "chatbot-api"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+license-file = "LICENSE"
+authors = ["Tim Van Wassenhove <github@timvw.be>"]
+description = "Chatbot API application with Rust"
 
 [dependencies]
