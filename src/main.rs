@@ -1,5 +1,7 @@
+mod sessions;
+
 use anyhow::Result;
-use axum::{routing::get, Router};
+use axum::Router;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -7,7 +9,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
 
     // build our application with a route
-    let app = Router::new().route("/", get(root));
+    let app = build_router();
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
@@ -16,7 +18,6 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-// basic handler that responds with a static string
-async fn root() -> &'static str {
-    "Hello, World!"
+fn build_router() -> Router {
+    Router::new().nest("/sessions", sessions::router::build_router())
 }
