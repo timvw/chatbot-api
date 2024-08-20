@@ -8,7 +8,7 @@ use axum::{Json, Router};
 use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct ThreadsState {
+struct ThreadsState {
     //application_state: Arc<ApplicationState>,
     threads_service: Arc<dyn ThreadsService + Send + Sync>,
 }
