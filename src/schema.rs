@@ -1,11 +1,14 @@
 use axum::response::IntoResponse;
 use http::StatusCode;
 
-struct AppError(anyhow::Error);
+pub struct AppError(anyhow::Error);
 
-impl From<anyhow::Error> for AppError {
-    fn from(value: anyhow::Error) -> Self {
-        Self(value)
+impl<E> From<E> for AppError
+where
+    E: Into<anyhow::Error>,
+{
+    fn from(err: E) -> Self {
+        Self(err.into())
     }
 }
 

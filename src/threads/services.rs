@@ -1,40 +1,37 @@
 use crate::threads::model::Thread;
-use arc_swap::ArcSwap;
+use anyhow::Result;
 use axum::async_trait;
-use std::sync::Arc;
-use uuid::{NoContext, Timestamp, Uuid};
+use tokio::sync::Mutex;
+use uuid::Uuid;
 
 #[async_trait]
-pub trait ThreadsService: Send + Sync {
-    async fn create(&self) -> Thread;
+pub trait ThreadsService {
+    async fn create(&self) -> Result<Thread>;
     async fn list(&self) -> Vec<Thread>;
 }
 
-pub struct MemorySessionsService {
-    ts: Timestamp,
-    sessions: ArcSwap<Vec<Thread>>,
+pub struct InMemoryThreadsService {
+    threads: Mutex<Vec<Thread>>,
 }
 
-impl MemorySessionsService {
+impl InMemoryThreadsService {
     pub fn new() -> Self {
-        let ts = Timestamp::from_unix(NoContext, 1497624119, 1234);
-        let sessions = ArcSwap::new(Arc::new(Vec::new()));
-        MemorySessionsService { ts, sessions }
+        let threads = Mutex::new(Vec::new());
+        InMemoryThreadsService { threads }
     }
 }
 
 #[async_trait]
-impl ThreadsService for MemorySessionsService {
-    async fn create(&self) -> Thread {
-        let thread = Thread {
-            id: Uuid::new_v7(self.ts),
-        };
-        //self.sessions.rcu(|mut inner| *inner.push(thread.clone()));
-        thread
+impl ThreadsService for InMemoryThreadsService {
+    async fn create(&self) -> Result<Thread> {
+        let thread = Thread { id: Uuid::new_v4() };
+        let mut threads = self.threads.lock().await;
+        threads.push(thread.clone());
+        Ok(thread)
     }
 
     async fn list(&self) -> Vec<Thread> {
-        //self.threads.load().clone()
-        todo!()
+        let threads = self.threads.lock().await;
+        threads.clone()
     }
 }

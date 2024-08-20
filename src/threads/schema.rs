@@ -1,4 +1,3 @@
-use crate::threads::model::Thread as ModelThread;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Default, Clone)]
@@ -9,6 +8,13 @@ pub struct Thread {
 
 impl From<crate::threads::model::Thread> for Thread {
     fn from(value: crate::threads::model::Thread) -> Self {
+        let id = value.id.to_string();
+        Thread { id }
+    }
+}
+
+impl From<&crate::threads::model::Thread> for Thread {
+    fn from(value: &crate::threads::model::Thread) -> Self {
         let id = value.id.to_string();
         Thread { id }
     }

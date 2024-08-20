@@ -7,7 +7,6 @@ mod threads;
 use crate::config::Settings;
 use crate::router::ApplicationState;
 use anyhow::Result;
-use axum::Router;
 use http::Method;
 use std::sync::Arc;
 use std::time::Duration;
