@@ -19,3 +19,15 @@ impl From<&crate::threads::model::Thread> for Thread {
         Thread { id }
     }
 }
+
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+#[allow(unused)]
+pub struct Message {
+    pub content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+#[allow(unused)]
+pub struct AddMessageRequest {
+    pub content: String,
+}
