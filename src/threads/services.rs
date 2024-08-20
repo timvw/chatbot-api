@@ -12,13 +12,11 @@ pub trait ThreadsService {
 }
 
 pub struct InMemoryThreadsService {
-    //threads: Mutex<Vec<Thread>>,
     threads: ArcSwap<Vec<Thread>>,
 }
 
 impl InMemoryThreadsService {
     pub fn new() -> Self {
-        //let threads = Mutex::new(Vec::new());
         let threads = ArcSwap::from_pointee(Vec::new());
         InMemoryThreadsService { threads }
     }
@@ -35,7 +33,6 @@ impl ThreadsService for InMemoryThreadsService {
     }
 
     async fn list(&self) -> Vec<Thread> {
-        //let threads = self.threads.lock().await;
         self.threads.load().to_vec()
     }
 }
