@@ -2,6 +2,23 @@
 
 A demo application exposing a chatbot API build with Rust ([axum](https://github.com/tokio-rs/axum) + friends)
 
+## Configuration
+
+Create a dotenvs/openai.env file with the following keys:
+
+```text
+OPENAI_API_KEY="sk-xxxx"
+```
+
+Create a dotenvs/jaeger.env file with the following keys:
+
+```text
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://yourhost:4317
+OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+OTEL_TRACES_SAMPLER=always_on
+OTEL_SERVICE_NAME=chatapi
+```
+
 ## Development
 
 ```bash
