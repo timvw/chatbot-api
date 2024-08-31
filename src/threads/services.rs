@@ -10,6 +10,7 @@ use async_openai::Client;
 use axum::async_trait;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tracing::Instrument;
 use uuid::{uuid, Uuid};
 
 #[async_trait]
@@ -20,6 +21,7 @@ pub trait ThreadsService {
     async fn add_message(&self, id: Uuid, content: &str) -> Result<String>;
 }
 
+#[derive(Debug)]
 pub struct InMemoryThreadsService {
     application_state: Arc<ApplicationState>,
     threads: ArcSwap<HashMap<Uuid, Thread>>,
@@ -68,10 +70,13 @@ impl ThreadsService for InMemoryThreadsService {
             .cloned()
     }
 
+
+    #[tracing::instrument]
     async fn add_message(&self, id: Uuid, content: &str) -> Result<String> {
         let mut thread = self.get(id).await?;
 
         let client = Client::new();
+
 
         let request = CreateChatCompletionRequestArgs::default()
             .max_tokens(self.application_state.settings.config.max_tokens)

@@ -7,34 +7,31 @@ mod threads;
 use crate::config::Settings;
 use crate::router::ApplicationState;
 use anyhow::Result;
+use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
 use http::Method;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::signal;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::timeout::TimeoutLayer;
-use tower_http::trace::TraceLayer;
-use tracing::level_filters::LevelFilter;
-use tracing::Level;
 use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::Registry;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv::from_path("/Users/tim.van.wassenhove/dotenvs/openai.env")?;
+    dotenv::from_path("/Users/tim.van.wassenhove/dotenvs/jaeger.env")?;
 
-    let subscriber = Registry::default()
-        .with(LevelFilter::from_level(Level::DEBUG))
-        .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));
-
-    tracing::subscriber::set_global_default(subscriber).expect("Failed to set subscriber");
+    init_tracing_opentelemetry::tracing_subscriber_ext::init_subscribers()?;
 
     let settings = Settings::default();
     let state = Arc::new(ApplicationState::new(&settings)?);
 
     // build our application with a route
     let app = router::build_router(state)
-        .layer(TraceLayer::new_for_http())
+        // include trace context as header into the response
+        .layer(OtelInResponseLayer::default())
+        //start OpenTelemetry trace on incoming request
+        .layer(OtelAxumLayer::default())
         .layer(
             CorsLayer::new()
                 .allow_origin(Any)
@@ -70,6 +67,8 @@ async fn shutdown_signal() {
 
     #[cfg(not(unix))]
     let terminate = std::future::pending::<()>();
+
+    //opentelemetry::global::shutdown_tracer_provider();
 
     tokio::select! {
         _ = ctrl_c => {},

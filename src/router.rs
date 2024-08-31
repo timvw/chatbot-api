@@ -3,6 +3,7 @@ use crate::threads;
 use axum::Router;
 use std::sync::Arc;
 
+#[derive(Debug)]
 pub struct ApplicationState {
     pub settings: Settings,
 }
