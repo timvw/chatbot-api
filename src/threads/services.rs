@@ -10,6 +10,7 @@ use async_openai::Client;
 use axum::async_trait;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tracing::Instrument;
 use uuid::{uuid, Uuid};
 
 #[async_trait]
@@ -76,7 +77,6 @@ impl ThreadsService for InMemoryThreadsService {
 
         let client = Client::new();
 
-
         let request = CreateChatCompletionRequestArgs::default()
             .max_tokens(self.application_state.settings.config.max_tokens)
             .model(self.application_state.settings.config.model.clone())
@@ -102,7 +102,10 @@ impl ThreadsService for InMemoryThreadsService {
             ])
             .build()?;
 
-        let response = client.chat().create(request).await?;
+        //client.instrument(tracing::info_span!("mehmeh"));
+
+        let span = tracing::info_span!("making a call to openai...");
+        let response = client.chat().create(request).instrument(span).await?;
 
         println!("\nResponse:\n");
         for choice in response.choices.clone() {
