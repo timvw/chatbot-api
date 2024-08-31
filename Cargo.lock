@@ -290,6 +290,7 @@ dependencies = [
  "dotenv",
  "http",
  "init-tracing-opentelemetry",
+ "opentelemetry",
  "serde",
  "serde_json",
  "tokio",

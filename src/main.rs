@@ -10,11 +10,11 @@ use anyhow::Result;
 use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
 use http::Method;
 use std::sync::Arc;
+use std::thread;
 use std::time::Duration;
 use tokio::signal;
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::timeout::TimeoutLayer;
-use tracing_subscriber::layer::SubscriberExt;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -29,7 +29,7 @@ async fn main() -> Result<()> {
     // build our application with a route
     let app = router::build_router(state)
         // include trace context as header into the response
-        .layer(OtelInResponseLayer::default())
+        .layer(OtelInResponseLayer)
         //start OpenTelemetry trace on incoming request
         .layer(OtelAxumLayer::default())
         .layer(
@@ -68,10 +68,20 @@ async fn shutdown_signal() {
     #[cfg(not(unix))]
     let terminate = std::future::pending::<()>();
 
-    //opentelemetry::global::shutdown_tracer_provider();
-
     tokio::select! {
         _ = ctrl_c => {},
         _ = terminate => {},
+    }
+
+    tracing::warn!("signal received, starting graceful shutdown");
+    use std::sync::mpsc;
+    let (sender, receiver) = mpsc::channel();
+    let _ = thread::spawn(move || {
+        opentelemetry::global::shutdown_tracer_provider();
+        sender.send(()).ok()
+    });
+    let shutdown_res = receiver.recv_timeout(Duration::from_millis(2_000));
+    if shutdown_res.is_err() {
+        tracing::error!("failed to shutdown OpenTelemetry");
     }
 }

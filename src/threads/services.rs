@@ -10,7 +10,6 @@ use async_openai::Client;
 use axum::async_trait;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tracing::Instrument;
 use uuid::{uuid, Uuid};
 
 #[async_trait]

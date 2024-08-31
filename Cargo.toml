@@ -23,3 +23,4 @@ dotenv = "0.15.0"
 async-openai = "0.24.0"
 axum-tracing-opentelemetry = "0.19.1"
 init-tracing-opentelemetry = {  version = "0.20.0", features = ["otlp", "tracing_subscriber_ext", ] }
+opentelemetry = "0.24.0"
