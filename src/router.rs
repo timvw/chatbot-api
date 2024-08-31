@@ -1,17 +1,16 @@
 use crate::config::Settings;
 use crate::threads;
-//use arc_swap::ArcSwap;
 use axum::Router;
 use std::sync::Arc;
 
 pub struct ApplicationState {
-    //pub settings: ArcSwap<Settings>,
+    pub settings: Settings,
 }
 
 impl ApplicationState {
-    pub fn new(_: &Settings) -> anyhow::Result<Self> {
+    pub fn new(settings: &Settings) -> anyhow::Result<Self> {
         Ok(Self {
-            //settings: ArcSwap::from_pointee(settings.clone()),
+            settings: settings.clone(),
         })
     }
 }

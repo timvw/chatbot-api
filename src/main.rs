@@ -21,6 +21,8 @@ use tracing_subscriber::Registry;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    dotenv::from_path("/Users/tim.van.wassenhove/dotenvs/openai.env")?;
+
     let subscriber = Registry::default()
         .with(LevelFilter::from_level(Level::DEBUG))
         .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));

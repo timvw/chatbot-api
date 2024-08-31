@@ -10,14 +10,12 @@ use uuid::Uuid;
 
 #[derive(Clone)]
 struct ThreadsState {
-    //application_state: Arc<ApplicationState>,
     threads_service: Arc<dyn ThreadsService + Send + Sync>,
 }
 
-pub fn build_router(_: Arc<ApplicationState>) -> Router {
+pub fn build_router(application_state: Arc<ApplicationState>) -> Router {
     let thread_state = ThreadsState {
-        //application_state: state,
-        threads_service: Arc::new(InMemoryThreadsService::new()),
+        threads_service: Arc::new(InMemoryThreadsService::new(application_state.clone())),
     };
 
     Router::new()
@@ -70,9 +68,6 @@ async fn add_message(
     }): State<ThreadsState>,
     Json(req): Json<AddMessageRequest>,
 ) -> AppResult<String> {
-    let _ = threads_service.add_message(thread_id, &req.content).await?;
-    /*Ok(Message {
-        content: "OK".to_string(),
-    })*/
-    Ok("OK".to_string())
+    let response = threads_service.add_message(thread_id, &req.content).await?;
+    Ok(response)
 }
