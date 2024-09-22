@@ -22,5 +22,5 @@ uuid = {  version = "1", features = ["v4", "v7", "serde"] }
 dotenv = "0.15.0"
 async-openai = "0.24.0"
 axum-tracing-opentelemetry = "0.21.0"
-init-tracing-opentelemetry = {  version = "0.20.0", features = ["otlp", "tracing_subscriber_ext", ] }
+init-tracing-opentelemetry = {  version = "0.21.0", features = ["otlp", "tracing_subscriber_ext", ] }
 opentelemetry = "0.25.0"
